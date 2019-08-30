@@ -1,0 +1,1 @@
+# Newly-coined-word-Translator
