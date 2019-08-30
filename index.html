@@ -1,0 +1,92 @@
+<html>
+    <head>
+        <title>신조어 번역기</title>
+        <link rel="icon" href="images/browser_icon.png">
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <link href='//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css' rel='stylesheet' type='text/css'>
+        <script src="jquery-3.4.1.js"></script>
+    </head>
+    
+    <body>
+        <header>
+            <div id="emptyBox"></div>
+            <div id="titleBox">
+                <a href="http://127.0.0.1/index.py" id="titleLogoLinker"><img src="images/title.png" id="titleLogo" alt="Title" height=55></a>
+            </div>
+        </header>
+        <article>
+            <div id="inputBox">
+                <div>
+                    <form action="index.py">
+                        <span id="coinSentenceInputTitle">신조어</span>
+                        <textarea name="coinSentence" placeholder="신조어를 입력하세요." maxlength="100" id="coinSentenceInput" oninput="document.getElementById('textLength').textContent=document.getElementById('coinSentenceInput').value.length.toString() + '/' + document.getElementById('coinSentenceInput').maxLength.toString();inspectTime()" onkeydown="resize(this)" onfocus="document.getElementById('coinSentenceInputTitle').className='coinSentenceInputButtonClassHover';document.getElementById('coinSentenceInputButtons').className='coinSentenceInputButtonsClassHover'" onfocusout="document.getElementById('coinSentenceInputTitle').className='coinSentenceInputButtonClass';document.getElementById('coinSentenceInputButtons').className='coinSentenceInputButtonsClass'"></textarea>
+                    </form>
+                    <div id="coinSentenceInputButtons" class="coinSentenceInputButtonsClass">
+                        <button type="button" onclick="request_input(document.getElementById('coinSentenceInput').value);" title="신조어 번역">번역</button>
+                        <span id="textLength">0/100</span>
+                    </div>
+                </div>
+
+                <div>
+                    <form action="index.py">
+                        <span>번역어</span>
+                        <textarea name="decl" id="translateResultInput" oninput="resize(this)" readonly></textarea>
+                    </form>
+                    <div id="coinSentenceResultButtons" class="coinSentenceResultButtonsClass">
+                        <button type="imagebutton" onclick="setTimeout(function() { document.getElementById('declbutton').click() }, 500);" title="번역 오류 신고"><img src="images/decl.png" width=27></button>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <footer>
+            <div id="icons">
+                <a href="/twitter_redirect.html" class="icon-twitter"><img src="images/twitterIcon.png" alt="Twitter" width=35></a>
+                <a href="/facebook_redirect.html" class="icon-facebook"><img src="images/facebookIcon.png" alt="Facebook" width=35></a>
+                <a href="/kakaostory_redirect.html" class="icon-kakaostory"><img src="images/kakaostoryIcon.png" alt="KakaoStory" width=35></a>
+            </div>
+        </footer>
+        <script type="text/javascript">
+            // coinSentenceInput의 내용 유지 + 커서를 제일 오른쪽으로
+            
+            isDottedOnCoinSentenceInput = false;  // coinSentenceInput 뒤에 ...이 붙어 있는가? 
+            inspectTimeCount = 0;
+            
+            socket = new WebSocket("ws://localhost:7404");
+            socket.onmessage = function(event) {
+                var recv_data = decodeURIComponent(event.data);
+                $("#translateResultInput").text(recv_data);
+            }
+            
+            // websocket에 신조어 번역 요청
+            function request_input(coinSentence) {
+                socket.send(encodeURIComponent(coinSentence))
+            }
+            
+            // coinSentenceInput에 입력한 후 0.5초동안 가만히 있으면 translate 요청
+            function inspectTime() {
+                if (!isDottedOnCoinSentenceInput) { // coinSentenceInput 뒤에 ...이 붙이기
+                    //document.getElementById('translateResultInput').value += "...";
+                    isDottedOnCoinSentenceInput = true;
+                }
+                inspectTimeCount += 1;
+                var currentInspectTimeCount = inspectTimeCount;
+                var value = document.getElementById("coinSentenceInput").value;
+                var check = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+                setTimeout(function() {
+                    var coinSentence = document.getElementById("coinSentenceInput").value;
+                    if (value === coinSentence && inspectTimeCount === currentInspectTimeCount) {
+                        if (!check.test(value.slice(-1))) {
+                            //document.getElementById("submitbutton").click(); // submitbutton 클릭 (translate 요청)
+                            request_input(coinSentence);
+                        }
+                    }
+                }, 500);
+            }
+            //$("#translateResultInput").text("ㅁ넝로ㅓㅁㅈ돌")
+    document.getElementById('textLength').textContent=document.getElementById('coinSentenceInput').value.length.toString() + '/' + document.getElementById('coinSentenceInput').maxLength.toString()
+        </script>
+        <script type="text/javascript" src="button-design.js"></script>
+        <script type="text/javascript" src="textarea-auto-resize.js"></script>
+    </body>
+</html>
