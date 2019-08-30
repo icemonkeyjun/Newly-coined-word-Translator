@@ -12,7 +12,7 @@
         <header>
             <div id="emptyBox"></div>
             <div id="titleBox">
-                <a href="http://127.0.0.1/index.py" id="titleLogoLinker"><img src="images/title.png" id="titleLogo" alt="Title" height=55></a>
+                <a href="https://icemonkeyjun.github.io/Newly-coined-word-Translator/" id="titleLogoLinker"><img src="images/title.png" id="titleLogo" alt="Title" height=55></a>
             </div>
         </header>
         <article>
@@ -52,7 +52,7 @@
             isDottedOnCoinSentenceInput = false;  // coinSentenceInput 뒤에 ...이 붙어 있는가? 
             inspectTimeCount = 0;
             
-            socket = new WebSocket("ws://localhost:7404");
+            socket = new WebSocket("ws://192.168.0.13:7404");
             socket.onmessage = function(event) {
                 var recv_data = decodeURIComponent(event.data);
                 $("#translateResultInput").text(recv_data);
